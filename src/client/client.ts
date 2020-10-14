@@ -20,8 +20,8 @@ document.body.appendChild(renderer.domElement)
 const controls = new OrbitControls(camera, renderer.domElement)
 
 const boxGeometry: THREE.BoxGeometry = new THREE.BoxGeometry()
-const basicMaterial: THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true })
-const cube: THREE.Mesh = new THREE.Mesh(boxGeometry, basicMaterial)
+const material: THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: false })
+const cube: THREE.Mesh = new THREE.Mesh(boxGeometry, material)
 scene.add(cube)
 
 const stats = Stats()
@@ -44,6 +44,28 @@ cubeScaleFolder.add(cube.scale, 'z', 0, 5, 0.1)
 cubeFolder.add(cube, 'visible', true)
 cubeFolder.open()
 
+const options = {
+    side: {
+        "FrontSide": THREE.FrontSide,
+        "BackSide": THREE.BackSide,
+        "DoubleSide": THREE.DoubleSide,
+    }
+}
+const materialFolder = gui.addFolder('Material')
+materialFolder.add(material, 'transparent')
+materialFolder.add(material, 'opacity', 0, 1, 0.01)
+materialFolder.add(material, 'depthTest')
+materialFolder.add(material, 'depthWrite')
+materialFolder.add(material, 'alphaTest', 0, 1, 0.01).onChange(() => updateMaterial())
+materialFolder.add(material, 'visible')
+materialFolder.add(material, 'side', options.side).onChange(() => updateMaterial())
+materialFolder.open()
+
+function updateMaterial() {
+    // change string ("FrontSide") from dat gui to number to apply change
+    material.side = Number(material.side)
+    material.needsUpdate = true
+}
 
 /* EVENTS */
 window.addEventListener('resize', onWindowResize, false)
